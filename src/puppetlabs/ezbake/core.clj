@@ -12,7 +12,8 @@
             [schema.utils :as schema-utils]
             [puppetlabs.ezbake.dependency-utils :as deputils]
             [puppetlabs.ezbake.exec :as exec]
-            [puppetlabs.config.typesafe :as ts]))
+            [puppetlabs.config.typesafe :as ts]
+            [cheshire.core :as json]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Vars
@@ -509,6 +510,11 @@ Dependency tree:
 
 (defmulti action
   (fn [action & args] action))
+
+(defmethod action "json"
+  [_ lein-project build-target]
+  (let [mymap (deputils/generate-dependency-map lein-project)]
+    (spit "foo.json" (json/generate-string mymap))))
 
 (defmethod action "stage"
   [_ lein-project build-target]
