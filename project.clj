@@ -9,6 +9,7 @@
                  [clj-time "0.6.0"]
                  [cheshire "5.7.0"]
                  [prismatic/schema "1.0.4"]
+                 [circleci/clj-yaml "0.5.5"]
                  [puppetlabs/typesafe-config "0.1.3" :exclusions [org.clojure/clojure]]]
 
   :repositories [["releases" "http://nexus.delivery.puppetlabs.net/content/repositories/releases/"]
