@@ -20,7 +20,7 @@
                                      :password :env/clojars_jenkins_password
                                      :sign-releases false}]]
 
-  :scm {:name "git" :url "https://github.com/puppetlabs/ezbake"}
+  :scm {:name "git" :url "https://github.com/demophoon/ezbake"}
 
   :resource-paths ["resources/"]
 
