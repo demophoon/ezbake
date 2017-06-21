@@ -7,6 +7,7 @@
             [clojure.set :as set]
             [clojure.string :as str]
             [clj-time.local :as local-time]
+            [clj-yaml.core :as yaml]
             [stencil.core :as stencil]
             [leiningen.core.main :as lein-main]
             [leiningen.core.project :as project]
@@ -18,7 +19,9 @@
             [schema.core :as schema]
             [puppetlabs.ezbake.dependency-utils :as deputils]
             [puppetlabs.ezbake.exec :as exec]
-            [puppetlabs.config.typesafe :as ts]))
+            [puppetlabs.config.typesafe :as ts]
+            [cheshire.core :as json]
+            [puppetlabs.kitchensink.core :as ks]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Vars
@@ -698,6 +701,23 @@ Additional uberjar dependencies:
 
 (defmulti action
   (fn [action & args] action))
+
+;; Based on mapkeys from kitchensink core
+(defn deep-mapkeys
+  "Return map `m`, with each key transformed by function `f`.
+  Operates over all keys in the map recursively."
+  [f m]
+  (into {} (concat (for [[k v] m]
+                     [(f k) (deep-mapkeys f v)]))))
+
+(defmethod action "json"
+  [_ lein-project build-target]
+  (let [dep-map (deputils/generate-dependency-map lein-project)
+        dep-version (deep-mapkeys #(map str (take 2 %)) dep-map)
+        json-string (json/generate-string dep-version)
+        yaml-string (yaml/generate-string dep-version)]
+    (spit "ezbake.json" json-string)
+    (spit "ezbake.yaml" yaml-string)))
 
 (defmethod action "stage"
   ;; note that the `lein-project` arg gets shadowed a few lines down to add full
